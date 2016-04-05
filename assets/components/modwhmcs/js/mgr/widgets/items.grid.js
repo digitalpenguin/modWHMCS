@@ -1,60 +1,44 @@
 modWHMCS.grid.Items = function(config) {
     config = config || {};
-
+    if (!config.id) {
+        config.id = 'modwhmcs-grid-items';
+    }
     Ext.applyIf(config, {
-        id: 'modwhmcs-grid-items'
-        ,url: modWHMCS.config.connectorUrl
-        ,baseParams: {
+        url: modWHMCS.config.connectorUrl,
+        fields: this.getFields(config),
+        columns: this.getColumns(config),
+        tbar: this.getTopBar(config),
+        //sm: new Ext.grid.CheckboxSelectionModel(),
+        baseParams: {
             action: 'mgr/item/getlist'
         }
-        ,fields: ['id','name','description']
-        ,paging: true
+        ,viewConfig: {
+            forceFit: true
+            ,enableRowBody: true
+            ,autoFill: true
+            ,showPreview: true
+            ,scrollOffset: 0
+            ,getRowClass: function (rec, ri, p) {
+                return !rec.data.active
+                    ? 'modwhmcs-grid-row-disabled'
+                    : '';
+            }
+        },
+        paging: true
         ,remoteSort: true
         ,save_action: 'mgr/item/updatefromgrid'
         ,autosave: true
         ,autoHeight: true
-        //,ddGroup: 'modwhmcsItemDDGroup'
-        //,enableDragDrop: true
-        ,columns: [{
-            header: _('id')
-            ,dataIndex: 'id'
-            ,width: 70
-        },{
-            header: _('name')
-            ,dataIndex: 'name'
-            ,width: 200
-            ,editor: { xtype: 'textfield' }
-        },{
-            header: _('description')
-            ,dataIndex: 'description'
-            ,width: 250
-            ,editor: { xtype: 'textfield' }
-        }]
-        ,tbar: [{
-            text: _('modwhmcs.item_create')
-            ,handler: this.createItem
-            ,scope: this
-        },'->',{
-            xtype: 'textfield'
-            ,id: 'modwhmcs-search-filter'
-            ,emptyText: _('modwhmcs.search...')
-            ,listeners: {
-                'change': {fn:this.search,scope:this}
-                ,'render': {fn: function(cmp) {
-                    new Ext.KeyMap(cmp.getEl(), {
-                        key: Ext.EventObject.ENTER
-                        ,fn: function() {
-                            this.fireEvent('change',this);
-                            this.blur();
-                            return true;
-                        }
-                        ,scope: cmp
-                    });
-                },scope:this}
-            }
-        }]
+        ,ddGroup: 'modwhmcsItemDDGroup'
+        ,enableDragDrop: true
     });
     modWHMCS.grid.Items.superclass.constructor.call(this,config);
+    // Clear selection on grid refresh
+    this.store.on('load', function () {
+        if (this._getSelectedIds().length) {
+            this.getSelectionModel().clearSelections();
+        }
+    }, this);
 };
 Ext.extend(modWHMCS.grid.Items,MODx.grid.Grid,{
     windows: {}
@@ -82,6 +66,34 @@ Ext.extend(modWHMCS.grid.Items,MODx.grid.Grid,{
             ,handler: this.removeItem
         });
         this.addContextMenuItem(m);
+    },getTopBar: function (config) {
+        return [{
+            text: '<i class="icon icon-plus"></i>&nbsp;' + _('modwhmcs.item_create'),
+            handler: this.createItem,
+            scope: this
+        }, '->', {
+            xtype: 'textfield',
+            name: 'query',
+            width: 200,
+            id: config.id + '-search-field',
+            emptyText: _('modwhmcs.grid_search'),
+            listeners: {
+                render: {
+                    fn: function (tf) {
+                        tf.getEl().addKeyListener(Ext.EventObject.ENTER, function () {
+                            this._doSearch(tf);
+                        }, this);
+                    }, scope: this
+                }
+            }
+        }, {
+            xtype: 'button',
+            id: config.id + '-search-clear',
+            text: '<i class="icon icon-times"></i>',
+            listeners: {
+                click: {fn: this._clearSearch, scope: this}
+            }
+        }];
     },createItem: function(btn,e) {
         this.createUpdateItem(btn, e, false);
     },updateItem: function(btn,e) {
@@ -121,6 +133,54 @@ Ext.extend(modWHMCS.grid.Items,MODx.grid.Grid,{
                 'success': {fn:function(r) { this.refresh(); },scope:this}
             }
         });
+    },
+    getFields: function (config) {
+        return ['id', 'name', 'description'];
+    },
+
+    getColumns: function (config) {
+        return [{
+            header: _('modwhmcs.item_id'),
+            dataIndex: 'id',
+            sortable: true,
+            width: 70
+        }, {
+            header: _('modwhmcs.item_name'),
+            dataIndex: 'name',
+            sortable: true,
+            width: 200
+        }, {
+            header: _('modwhmcs.item_description'),
+            dataIndex: 'description',
+            sortable: false,
+            width: 250
+        }];
+    },
+
+    _getSelectedIds: function () {
+        var ids = [];
+        var selected = this.getSelectionModel().getSelections();
+
+        for (var i in selected) {
+            if (!selected.hasOwnProperty(i)) {
+                continue;
+            }
+            ids.push(selected[i]['id']);
+        }
+        return ids;
+    },
+
+    _doSearch: function (tf, nv, ov) {
+        this.getStore().baseParams.query = tf.getValue();
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
+    },
+
+    _clearSearch: function (btn, e) {
+        this.getStore().baseParams.query = '';
+        Ext.getCmp(this.config.id + '-search-field').setValue('');
+        this.getBottomToolbar().changePage(1);
+        this.refresh();
     }
 });
 Ext.reg('modwhmcs-grid-items',modWHMCS.grid.Items);

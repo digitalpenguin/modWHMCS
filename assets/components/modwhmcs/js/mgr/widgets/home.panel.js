@@ -3,7 +3,8 @@ modWHMCS.panel.Home = function(config) {
     Ext.apply(config,{
         border: false
         ,baseCls: 'modx-formpanel'
-        ,cls: 'container'
+        ,layout: 'anchor'
+        ,hideMode: 'offsets'
         ,items: [{
             html: '<h2>'+_('modwhmcs')+'</h2>'
             ,border: false
@@ -19,6 +20,7 @@ modWHMCS.panel.Home = function(config) {
                 ,items: [{
                     html: '<p>'+_('modwhmcs.intro_msg')+'</p>'
                     ,border: false
+                    ,layout:'anchor'
                     ,bodyCssClass: 'panel-desc'
                 },{
                     xtype: 'modwhmcs-grid-items'

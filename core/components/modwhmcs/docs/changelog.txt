@@ -1,0 +1,9 @@
+Changelog for modWHMCS.
+
+modWHMCS 0.0.2
+==============
+- Added ability to sort grid by drag and drop.
+
+modWHMCS 0.0.1
+==============
+- Initial release.

@@ -3,10 +3,11 @@ modWHMCS.panel.Home = function(config) {
     Ext.apply(config,{
         border: false
         ,baseCls: 'modx-formpanel'
+        ,cls: 'container'
         ,layout: 'anchor'
         ,hideMode: 'offsets'
         ,items: [{
-            html: '<h2>'+_('modwhmcs')+'</h2>'
+            html: '<div id="modwhmcs-logo-wrapper"><img id="modx-modwhmcs-logo" alt=\'MODX Logo\' src=\''+MODx.config["modwhmcs.assets_url"]+'img/modx.png\'><img id="whmcs-logo" alt=\'WHMCS Logo\' src=\''+MODx.config["modwhmcs.assets_url"]+'img/whmcs-logo.png\'></div>'
             ,border: false
             ,cls: 'modx-page-header'
         },{
@@ -22,9 +23,13 @@ modWHMCS.panel.Home = function(config) {
                     ,border: false
                     ,layout:'anchor'
                     ,bodyCssClass: 'panel-desc'
-                },{
+                }/*,{
                     xtype: 'modwhmcs-grid-items'
                     ,preventRender: true
+                    ,cls: 'main-wrapper'
+                }*/,{
+                    xtype: 'modwhmcs-grid-tickets'
+                    ,preventRender:true
                     ,cls: 'main-wrapper'
                 }]
             }]

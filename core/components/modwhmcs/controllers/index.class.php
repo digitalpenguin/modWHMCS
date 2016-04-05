@@ -29,6 +29,7 @@ class modWHMCSIndexManagerController extends modExtraManagerController {
     public function getPageTitle() { return $this->modx->lexicon('modwhmcs'); }
     public function loadCustomCssJs() {
         $this->addJavascript($this->modwhmcs->config['jsUrl'].'mgr/extra/griddraganddrop.js');
+        $this->addJavascript($this->modwhmcs->config['jsUrl'].'mgr/widgets/tickets.grid.js');
         $this->addJavascript($this->modwhmcs->config['jsUrl'].'mgr/widgets/items.grid.js');
         $this->addJavascript($this->modwhmcs->config['jsUrl'].'mgr/widgets/home.panel.js');
         $this->addLastJavascript($this->modwhmcs->config['jsUrl'].'mgr/sections/index.js');

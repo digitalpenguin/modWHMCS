@@ -2,3 +2,16 @@
     content: "* ";
     color: red;
 }
+
+#modwhmcs-logo-wrapper {
+    margin: 20px 0 10px 0;
+}
+
+#modx-logo {
+    float:left;
+}
+
+#whmcs-logo {
+    height:40px;
+    padding-bottom:3px;
+}

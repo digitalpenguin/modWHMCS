@@ -67,8 +67,7 @@ Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
     },getTopBar: function (config) {
         return [{
             text: '<i class="icon icon-plus"></i>&nbsp;' + _('modwhmcs.ticket_create'),
-            //handler: this.createTicket,
-            handler: this.test,
+            handler: this.createTicket,
             scope: this
         }, '->', {
             xtype: 'textfield',
@@ -93,10 +92,6 @@ Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
                 click: {fn: this._clearSearch, scope: this}
             }
         }];
-    },test: function(btn,e) {
-        console.log(this.getStore().baseParams = {
-            action: 'mgr/ticket/getList'
-        });
     },createTicket: function(btn,e) {
         this.createUpdateTicket(btn, e, false);
     },updateTicket: function(btn,e) {
@@ -138,7 +133,7 @@ Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
         });
     },
     getFields: function (config) {
-        return ['id', 'name', 'description'];
+        return ['id', 'email', 'name', 'subject', 'date', 'lastreply', 'status'];
     },
 
     getColumns: function (config) {
@@ -147,15 +142,30 @@ Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
             dataIndex: 'id',
             sortable: true,
             width: 70
-        }, {
-            header: _('modwhmcs.ticket_name'),
-            dataIndex: 'name',
-            sortable: true,
-            width: 200
-        }, {
-            header: _('modwhmcs.ticket_description'),
-            dataIndex: 'description',
+        },{
+            header: _('modwhmcs.ticket_email'),
+            dataIndex: 'email',
             sortable: false,
+            width: 200
+        },{
+            header: _('modwhmcs.ticket_subject'),
+            dataIndex: 'subject',
+            sortable: false,
+            width: 250
+        },{
+            header: _('modwhmcs.ticket_creation_date'),
+            dataIndex: 'date',
+            sortable: true,
+            width: 250
+        },{
+            header: _('modwhmcs.ticket_last_reply'),
+            dataIndex: 'lastreply',
+            sortable: true,
+            width: 250
+        },{
+            header: _('modwhmcs.ticket_status'),
+            dataIndex: 'status',
+            sortable: true,
             width: 250
         }];
     },

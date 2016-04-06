@@ -1,5 +1,5 @@
 <?php
-$whmcsUrl = $modx->getOption('modwhmcs.modwhmcs_url');
+$whmcsUrl = $modx->getOption('modwhmcs.whmcs_url');
 
 $username = $modx->getOption('modwhmcs.username');
 $password = $modx->getOption('modwhmcs.password');
@@ -28,5 +28,13 @@ curl_close($ch);
 
 $jsonData = json_decode($response, true);
 
+$count = $jsonData['numreturned'];
+
+$tickets = $jsonData['tickets']['ticket'];
+
+return '{"success":true,"total":"'.$count.'", "results":'.$modx->toJSON($tickets).'}';
+
+//convert to JSON for grid consumption
+//return $modx->outputArray($tickets,$count);
 // Dump array structure for inspection
-echo '<pre>'.print_r($jsonData).'</pre>';
+//echo '<pre>' . var_export($jsonData, true) . '</pre>';

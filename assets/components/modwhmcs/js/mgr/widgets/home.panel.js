@@ -17,7 +17,7 @@ modWHMCS.panel.Home = function(config) {
             ,activeTab: 0
             ,hideMode: 'offsets'
             ,items: [{
-                title: _('modwhmcs.items')
+                title: _('modwhmcs.tickets')
                 ,items: [{
                     html: '<p>'+_('modwhmcs.intro_msg')+'</p>'
                     ,border: false

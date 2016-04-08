@@ -4,8 +4,7 @@ class GetTicketsProcessor extends modProcessor {
     public $defaultSortField = 'id';
     /** @var string $defaultSortDirection The default direction to sort */
     public $defaultSortDirection = 'ASC';
-    /** @var int $currentIndex The current index of successful iteration */
-    public $currentIndex = 0;
+
 
 
     public function initialize() {
@@ -51,7 +50,32 @@ class GetTicketsProcessor extends modProcessor {
         $apiData['results'] = $jsonData['tickets']['ticket'];
         return $apiData;
     }
+/*
+    public function cachedRequest($method, $uri = null, array $options = []) {
 
+        $cacheKey = 'whatevername';
+        $cacheHandler = $this->modx->getOption(xPDO::OPT_CACHE_HANDLER, null, 'xPDOFileCache');
+        $cacheExpires = intval($this->getOption('cache_expires', $options, $this->options['cache_expires'], true));
+        $cacheOptions = array(
+            xPDO::OPT_CACHE_KEY => $cacheKey,
+            xPDO::OPT_CACHE_HANDLER => $cacheHandler,
+            xPDO::OPT_CACHE_EXPIRES => $cacheExpires,
+        );
+
+        $cacheElementKey = md5($method . $uri . json_encode($options));
+        $request = $this->modx->cacheManager->get($cacheElementKey, $cacheOptions);
+        if (empty($request)) {
+            $response = $this->client->request($method, $uri, $options);
+            if ($response && $response->getBody()) {
+                $request = json_decode($response->getBody()->getContents(), true);
+            } else {
+                $request = array();
+            }
+            $this->modx->cacheManager->set($cacheElementKey, $request, $cacheExpires, $cacheOptions);
+        }
+        return $request;
+    }
+*/
     public function process() {
         $data = $this->getData();
         return $this->outputArray($data['results'],$data['total']);
@@ -77,12 +101,19 @@ class GetTicketsProcessor extends modProcessor {
             if ($key > $limit) break;
         }
 
-        //Sort not working yet
+        //Sort
         if (empty($sortKey = $this->getProperty('sort'))) $sortKey = $this->defaultSortField;
-        if ($this->defaultSortField == 'ASC') {
-            $data['results'] = asort($data['results'][$this->defaultSortField]);
-        } else if ($this->defaultSortField == 'DESC') {
-            $data['results'] = arsort($data['results'][$this->defaultSortField]);
+        if (empty($sortDir = $this->getProperty('dir'))) $sortDir = $this->defaultSortDirection;
+        if ($sortDir == 'DESC') {
+            foreach ($data['results'] as $key => $row) {
+                $dates[$key]  = $row[$sortKey];
+            }
+            array_multisort($dates, SORT_DESC, $data['results']);
+        } else {
+            foreach ($data['results'] as $key => $row) {
+                $dates[$key]  = $row[$sortKey];
+            }
+            array_multisort($dates, SORT_ASC, $data['results']);
         }
 
         return $data;

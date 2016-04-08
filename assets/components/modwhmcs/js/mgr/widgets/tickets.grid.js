@@ -32,11 +32,11 @@ modWHMCS.grid.Tickets = function(config) {
     });
     modWHMCS.grid.Tickets.superclass.constructor.call(this,config);
     // Clear selection on grid refresh
-    this.store.on('load', function () {
+    /*this.store.on('load', function () {
         if (this._getSelectedIds().length) {
             this.getSelectionModel().clearSelections();
         }
-    }, this);
+    }, this);*/
 };
 Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
     windows: {}
@@ -145,12 +145,12 @@ Ext.extend(modWHMCS.grid.Tickets,MODx.grid.Grid,{
         },{
             header: _('modwhmcs.ticket_email'),
             dataIndex: 'email',
-            sortable: false,
+            sortable: true,
             width: 200
         },{
             header: _('modwhmcs.ticket_subject'),
             dataIndex: 'subject',
-            sortable: false,
+            sortable: true,
             width: 250
         },{
             header: _('modwhmcs.ticket_creation_date'),

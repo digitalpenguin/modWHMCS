@@ -1,10 +1,13 @@
 <?php
+
+require '/var/www/public/modxdev.local/modWHMCS/core/components/modwhmcs/model/libs/vendor/autoload.php';
+//require $modx->getOption('modwhmcs.core_path').'model/libs/vendor/autoload.php';
+
 class GetTicketsProcessor extends modProcessor {
     /** @var string $defaultSortField The default field to sort by */
     public $defaultSortField = 'id';
     /** @var string $defaultSortDirection The default direction to sort */
     public $defaultSortDirection = 'ASC';
-
 
 
     public function initialize() {

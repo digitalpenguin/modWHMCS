@@ -1,9 +1,8 @@
 <?php
 // Require composer autoloader for guzzle
 require dirname(dirname(dirname(dirname(__FILE__)))).'/model/libs/vendor/autoload.php';
+
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 
 class GetTicketsProcessor extends modProcessor {
     /** @var string $defaultSortField The default field to sort by */
@@ -43,21 +42,20 @@ class GetTicketsProcessor extends modProcessor {
             'responsetype' => 'json'
         );
 
-        // Call the API
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->apiUrl . 'includes/api.php');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-        $response = curl_exec($ch);
-        if (curl_error($ch)) {
-            die('Unable to connect: ' . curl_errno($ch) . ' - ' . curl_error($ch));
-        }
-        curl_close($ch);
-        // Attempt to decode response as json
-        $jsonData = json_decode($response, true);
+        $client = new Client([
+            'base_uri' => 'https://www.hyperdrivehosting.net/billing/',
+            'timeout'  => 30,
+        ]);
+
+        $response = $client->request('POST', 'includes/api.php', [
+            'form_params' => $postfields
+        ]);
+        $jsonData = json_decode($response->getBody(), true);
+
+        //$this->modx->log(modX::LOG_LEVEL_DEBUG, 'Response: '. print_r($jsonData,true));
+
         $apiData['total'] = $jsonData['numreturned'];
+        $this->modx->log(modX::LOG_LEVEL_DEBUG, 'total: '. $apiData['total']);
         $apiData['results'] = $jsonData['tickets']['ticket'];
         return $apiData;
     }

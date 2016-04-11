@@ -1,43 +1,51 @@
 <?php
-
-require '/var/www/public/modxdev.local/modWHMCS/core/components/modwhmcs/model/libs/vendor/autoload.php';
-//require $modx->getOption('modwhmcs.core_path').'model/libs/vendor/autoload.php';
+// Require composer autoloader for guzzle
+require dirname(dirname(dirname(dirname(__FILE__)))).'/model/libs/vendor/autoload.php';
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 class GetTicketsProcessor extends modProcessor {
     /** @var string $defaultSortField The default field to sort by */
     public $defaultSortField = 'id';
     /** @var string $defaultSortDirection The default direction to sort */
     public $defaultSortDirection = 'ASC';
-
+    /** @var  string $apiUrl URL of the API */
+    private $apiUrl;
+    /** @var  string $username Username for the API */
+    private $username;
+    /** @var  string $password Password for the API */
+    private $password;
 
     public function initialize() {
+        $this->apiUrl = $this->modx->getOption('modwhmcs.whmcs_url');
+        $this->username = $this->modx->getOption('modwhmcs.username');
+        $this->password = $this->modx->getOption('modwhmcs.password');
+
         $this->setDefaultProperties(array(
             'start' => 0,
             'limit' => 20,
             'sort' => $this->defaultSortField,
             'dir' => $this->defaultSortDirection,
             'combo' => false,
-            'query' => '',
+            'query' => ''
         ));
+
         return parent::initialize();
     }
 
     public function getAPIData() {
-        $whmcsUrl = $this->modx->getOption('modwhmcs.whmcs_url');
-        $username = $this->modx->getOption('modwhmcs.username');
-        $password = $this->modx->getOption('modwhmcs.password');
-
         // Set post values
         $postfields = array(
-            'username' => $username,
-            'password' => md5($password),
+            'username' => $this->username,
+            'password' => md5($this->password),
             'action' => 'gettickets',
-            'responsetype' => 'json',
+            'responsetype' => 'json'
         );
 
         // Call the API
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $whmcsUrl . 'includes/api.php');
+        curl_setopt($ch, CURLOPT_URL, $this->apiUrl . 'includes/api.php');
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -53,10 +61,10 @@ class GetTicketsProcessor extends modProcessor {
         $apiData['results'] = $jsonData['tickets']['ticket'];
         return $apiData;
     }
-/*
-    public function cachedRequest($method, $uri = null, array $options = []) {
 
-        $cacheKey = 'whatevername';
+    /*public function cachedRequest($method, $uri = null, array $options = []) {
+
+        $cacheKey = $this->cacheKey;
         $cacheHandler = $this->modx->getOption(xPDO::OPT_CACHE_HANDLER, null, 'xPDOFileCache');
         $cacheExpires = intval($this->getOption('cache_expires', $options, $this->options['cache_expires'], true));
         $cacheOptions = array(
@@ -77,8 +85,8 @@ class GetTicketsProcessor extends modProcessor {
             $this->modx->cacheManager->set($cacheElementKey, $request, $cacheExpires, $cacheOptions);
         }
         return $request;
-    }
-*/
+    }*/
+
     public function process() {
         $data = $this->getData();
         return $this->outputArray($data['results'],$data['total']);

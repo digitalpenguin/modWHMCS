@@ -1,0 +1,7 @@
+{
+    "name": "modWHMCS",
+    "lowCaseName": "modwhmcs",
+    "description": "Integration of WHMCS into MODX",
+    "author": "Murray Wood @ Digital Penguin",
+    "version": "0.1"
+}
